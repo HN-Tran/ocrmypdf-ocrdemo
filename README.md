@@ -1,6 +1,6 @@
 # ocrmypdf-ocrdemo
 
-Apache-2.0. OCRmyPDF plugin that runs OCR through an **ocr-demo–compatible** HTTP service (`POST /api/ocr`) instead of Tesseract, and builds a searchable PDF text layer via OCRmyPDF’s fpdf2 path (`generate_ocr`). You can use it from the **CLI** or from **paperless-ngx** (see [Paperless-ngx integration](#paperless-ngx-integration)).
+OCRmyPDF plugin that sends page images to a **remote HTTP OCR service** compatible with **ocr-demo** (`POST /api/ocr`), instead of using Tesseract for recognition. OCRmyPDF still assembles the searchable PDF text layer via its fpdf2 path (`generate_ocr`). Use it from the **CLI** or from stacks such as **paperless-ngx** (see [Paperless-ngx integration](#paperless-ngx-integration)).
 
 ## Install
 

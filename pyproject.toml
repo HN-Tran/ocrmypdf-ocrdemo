@@ -1,7 +1,7 @@
 [project]
 name = "ocrmypdf-ocrdemo"
 version = "0.1.0"
-description = "OCRmyPDF plugin: OCR pages via an ocr-demo HTTP API (POST /api/ocr)"
+description = "OCRmyPDF plugin: remote page OCR via an ocr-demo-compatible HTTP API"
 readme = "README.md"
 license = { text = "Apache-2.0" }
 authors = [{ name = "HN-Tran" }]
