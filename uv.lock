@@ -560,7 +560,7 @@ wheels = [
 ]
 
 [[package]]
-name = "ocrmypdf-ocrdemo"
+name = "ocrmypdf-docread"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

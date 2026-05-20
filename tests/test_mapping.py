@@ -1,6 +1,6 @@
-"""Unit tests for ocrmypdf_ocrdemo.mapping."""
+"""Unit tests for ocrmypdf_docread.mapping."""
 
-from ocrmypdf_ocrdemo.mapping import (
+from ocrmypdf_docread.mapping import (
     build_ocr_tree_from_response,
     decompose_server_net_ccw,
     extract_net_angle_first_page,

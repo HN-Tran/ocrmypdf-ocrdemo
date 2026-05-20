@@ -1,7 +1,7 @@
 [project]
-name = "ocrmypdf-ocrdemo"
+name = "ocrmypdf-docread"
 version = "0.1.0"
-description = "OCRmyPDF plugin: remote page OCR via an ocr-demo-compatible HTTP API"
+description = "OCRmyPDF plugin: remote page OCR via the docread HTTP API (POST /api/ocr)"
 readme = "README.md"
 license = { text = "Apache-2.0" }
 authors = [{ name = "HN-Tran" }]
@@ -13,11 +13,17 @@ dependencies = [
     "pydantic>=2.0.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/HN-Tran/ocrmypdf-docread"
+Repository = "https://github.com/HN-Tran/ocrmypdf-docread"
+Documentation = "https://github.com/HN-Tran/ocrmypdf-docread#readme"
+Issues = "https://github.com/HN-Tran/ocrmypdf-docread/issues"
+
 [project.optional-dependencies]
 dev = ["pytest>=8.0.0", "respx>=0.21.0"]
 
 [project.entry-points."ocrmypdf"]
-ocrdemo = "ocrmypdf_ocrdemo.plugin"
+docread = "ocrmypdf_docread.plugin"
 
 [build-system]
 requires = ["uv_build>=0.11.14,<0.12.0"]

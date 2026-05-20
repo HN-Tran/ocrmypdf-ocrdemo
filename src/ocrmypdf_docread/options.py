@@ -1,4 +1,4 @@
-"""CLI / OcrOptions extension for the ocr-demo engine."""
+"""CLI / OcrOptions extension for the docread engine."""
 
 from __future__ import annotations
 
@@ -8,14 +8,14 @@ from typing import Annotated
 from pydantic import BaseModel, Field, HttpUrl
 
 
-class OcrdemoOptions(BaseModel):
-    """Options for the ocr-demo remote OCR engine."""
+class DocreadOptions(BaseModel):
+    """Options for the docread remote OCR engine."""
 
     base_url: Annotated[
         HttpUrl | None,
         Field(
             default=None,
-            description="Base URL of ocr-demo (e.g. http://127.0.0.1:8000)",
+            description="Base URL of docread (e.g. http://127.0.0.1:8000)",
         ),
     ] = None
     timeout: Annotated[
@@ -23,14 +23,14 @@ class OcrdemoOptions(BaseModel):
         Field(ge=1.0, le=3600.0, description="HTTP timeout for each OCR request (seconds)"),
     ] = 300.0
     verify_ssl: Annotated[bool, Field(description="Verify TLS certificates")] = True
-    mode: Annotated[str, Field(description="ocr-demo mode query (plain|structured)")] = "plain"
+    mode: Annotated[str, Field(description="docread mode query (plain|structured)")] = "plain"
     backend: Annotated[
         str | None,
-        Field(default=None, description="ocr-demo backend query (direct|expert|...)"),
+        Field(default=None, description="docread backend query (direct|expert|...)"),
     ] = None
     task: Annotated[
         str | None,
-        Field(default=None, description="Optional ocr-demo task query parameter"),
+        Field(default=None, description="Optional docread task query parameter"),
     ] = None
     token_limit: Annotated[
         int | None,
@@ -53,70 +53,70 @@ class OcrdemoOptions(BaseModel):
     @classmethod
     def add_arguments_to_parser(cls, parser: argparse.ArgumentParser) -> None:
         group = parser.add_argument_group(
-            "ocr-demo",
-            "Remote OCR via ocr-demo HTTP API (POST /api/ocr).",
+            "docread",
+            "Remote OCR via docread HTTP API (POST /api/ocr).",
         )
         group.add_argument(
-            "--ocrdemo-base-url",
+            "--docread-base-url",
             default=None,
-            dest="ocrdemo_base_url",
+            dest="docread_base_url",
             metavar="URL",
-            help="Base URL of the running ocr-demo instance (required for --ocr-engine ocrdemo).",
+            help="Base URL of the running docread instance (required for --ocr-engine docread).",
         )
         group.add_argument(
-            "--ocrdemo-timeout",
+            "--docread-timeout",
             type=float,
             default=300.0,
             metavar="SEC",
-            dest="ocrdemo_timeout",
+            dest="docread_timeout",
             help="HTTP timeout in seconds for each OCR request (default: 300).",
         )
         group.add_argument(
-            "--ocrdemo-no-verify-ssl",
+            "--docread-no-verify-ssl",
             action="store_true",
-            dest="ocrdemo_no_verify_ssl",
+            dest="docread_no_verify_ssl",
             help="Disable TLS certificate verification (not recommended).",
         )
         group.add_argument(
-            "--ocrdemo-mode",
+            "--docread-mode",
             default="plain",
-            dest="ocrdemo_mode",
-            help="Value for ocr-demo ?mode= (default: plain).",
+            dest="docread_mode",
+            help="Value for docread ?mode= (default: plain).",
         )
         group.add_argument(
-            "--ocrdemo-backend",
+            "--docread-backend",
             default=None,
-            dest="ocrdemo_backend",
-            help="Optional ocr-demo ?backend= override (e.g. direct, expert).",
+            dest="docread_backend",
+            help="Optional docread ?backend= override (e.g. direct, expert).",
         )
         group.add_argument(
-            "--ocrdemo-task",
+            "--docread-task",
             default=None,
-            dest="ocrdemo_task",
-            help="Optional ocr-demo ?task= query parameter.",
+            dest="docread_task",
+            help="Optional docread ?task= query parameter.",
         )
         group.add_argument(
-            "--ocrdemo-token-limit",
+            "--docread-token-limit",
             type=int,
             default=None,
-            dest="ocrdemo_token_limit",
+            dest="docread_token_limit",
             metavar="N",
-            help="Optional ocr-demo ?token_limit=.",
+            help="Optional docread ?token_limit=.",
         )
         group.add_argument(
-            "--ocrdemo-api-token",
+            "--docread-api-token",
             default=None,
-            dest="ocrdemo_api_token",
+            dest="docread_api_token",
             metavar="TOKEN",
             help="If set, send Authorization: Bearer TOKEN on each request.",
         )
         group.add_argument(
-            "--ocrdemo-no-remote-geometry-hints",
+            "--docread-no-remote-geometry-hints",
             action="store_true",
-            dest="ocrdemo_no_remote_geometry_hints",
+            dest="docread_no_remote_geometry_hints",
             help=(
-                "Do not call ocr-demo for get_orientation/get_deskew (avoids extra "
-                "HTTP traffic; use when ocr-demo DESKEW_ENABLED=false and you rely on "
+                "Do not call docread for get_orientation/get_deskew (avoids extra "
+                "HTTP traffic; use when docread DESKEW_ENABLED=false and you rely on "
                 "local --rotate-pages/--deskew only)."
             ),
         )

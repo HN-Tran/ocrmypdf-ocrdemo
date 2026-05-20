@@ -1,4 +1,4 @@
-"""Map ocr-demo JSON into OCRmyPDF OcrElement trees and orientation hints."""
+"""Map docread JSON into OCRmyPDF OcrElement trees and orientation hints."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from ocrmypdf.pluginspec import OrientationConfidence
 
 
 def decompose_server_net_ccw(net: float) -> tuple[int, float]:
-    """Split ocr-demo ``page_info.angle`` (net CCW correction) into cardinal + fine.
+    """Split docread ``page_info.angle`` (net CCW correction) into cardinal + fine.
 
     Returns ``(cardinal_ccw, fine_ccw)`` where ``cardinal_ccw`` is a multiple of
     90 in ``{0, 90, 180, 270}`` and ``fine_ccw`` is the residual in roughly
@@ -35,10 +35,10 @@ def decompose_server_net_ccw(net: float) -> tuple[int, float]:
 def server_angle_to_orientation(net_ccw: float) -> OrientationConfidence:
     """Map server net CCW correction to OCRmyPDF :class:`OrientationConfidence`.
 
-    This is a **heuristic**: ocr-demo stores total **CCW** correction applied during
+    This is a **heuristic**: docread stores total **CCW** correction applied during
     preprocessing, while OCRmyPDF's rotate-pages path expects the same convention as
     Tesseract OSD (see OCRmyPDF docs). When in doubt, disable ``--rotate-pages`` or
-    set ``--ocrdemo-no-remote-geometry-hints`` and rely on OCRmyPDF-only geometry.
+    set ``--docread-no-remote-geometry-hints`` and rely on OCRmyPDF-only geometry.
     """
     cardinal_ccw, _fine = decompose_server_net_ccw(net_ccw)
     if cardinal_ccw == 0:
@@ -118,7 +118,7 @@ def build_ocr_tree_from_response(
     target_height: int,
     dpi: float,
 ) -> tuple[OcrElement, str]:
-    """Build an ``OcrElement`` page tree and plain text from ocr-demo JSON."""
+    """Build an ``OcrElement`` page tree and plain text from docread JSON."""
     text = str(data.get("text") or "")
     analyze = cast(dict[str, Any], data.get("analyzeResult") or {})
     pages = cast(list[dict[str, Any]], analyze.get("pages") or [])
@@ -194,7 +194,7 @@ def build_ocr_tree_from_response(
 
 
 def extract_net_angle_first_page(data: dict[str, Any]) -> float:
-    """Read ``analyzeResult.pages[0].angle`` from an ocr-demo response."""
+    """Read ``analyzeResult.pages[0].angle`` from an docread response."""
     analyze = cast(dict[str, Any], data.get("analyzeResult") or {})
     pages = cast(list[dict[str, Any]], analyze.get("pages") or [])
     if not pages:

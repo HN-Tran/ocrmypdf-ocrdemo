@@ -1,25 +1,27 @@
-# ocrmypdf-ocrdemo
+# ocrmypdf-docread
 
-OCRmyPDF plugin that sends page images to a **remote HTTP OCR service** compatible with **ocr-demo** (`POST /api/ocr`), instead of using Tesseract for recognition. OCRmyPDF still assembles the searchable PDF text layer via its fpdf2 path (`generate_ocr`). Use it from the **CLI** or from stacks such as **paperless-ngx** (see [Paperless-ngx integration](#paperless-ngx-integration)).
+OCRmyPDF plugin that sends page images to **[docread](https://github.com/HN-Tran/docread)** (`POST /api/ocr`) instead of using Tesseract for recognition. OCRmyPDF still assembles the searchable PDF text layer via its fpdf2 path (`generate_ocr`). Use it from the **CLI** or from stacks such as **paperless-ngx** (see [Paperless-ngx integration](#paperless-ngx-integration)).
+
+Source: [github.com/HN-Tran/ocrmypdf-docread](https://github.com/HN-Tran/ocrmypdf-docread)
 
 ## Install
 
 ```bash
-cd ocrmypdf-ocrdemo
+cd ocrmypdf-docread
 uv sync
 # or: pip install .
 ```
 
-OCRmyPDF still expects a **Tesseract** binary to be installed for its built-in plugin’s `check_options` hook, even when you select `--ocr-engine ocrdemo` (upstream behaviour). Install `tesseract-ocr` (or equivalent) on the machine that runs `ocrmypdf`.
+OCRmyPDF still expects a **Tesseract** binary to be installed for its built-in plugin’s `check_options` hook, even when you select `--ocr-engine docread` (upstream behaviour). Install `tesseract-ocr` (or equivalent) on the machine that runs `ocrmypdf`.
 
 ## Usage
 
-Start **ocr-demo**, then:
+Start **docread**, then:
 
 ```bash
 ocrmypdf \
-  --ocr-engine ocrdemo \
-  --ocrdemo-base-url http://127.0.0.1:8000 \
+  --ocr-engine docread \
+  --docread-base-url http://127.0.0.1:8000 \
   --force-ocr \
   input.pdf output.pdf
 ```
@@ -28,21 +30,21 @@ Optional flags:
 
 | Flag | Meaning |
 |------|---------|
-| `--ocrdemo-backend expert` | Passes `backend=` to ocr-demo |
-| `--ocrdemo-mode plain` | Default; matches ocr-demo `mode` |
-| `--ocrdemo-task ocr_text` | Sets `task=` query |
-| `--ocrdemo-token-limit 8192` | Sets `token_limit=` |
-| `--ocrdemo-api-token TOKEN` | Sends `Authorization: Bearer …` |
-| `--ocrdemo-no-verify-ssl` | Disables TLS verification |
-| `--ocrdemo-no-remote-geometry-hints` | Skips extra HTTP calls for `--rotate-pages` / `--deskew` hints (see below) |
+| `--docread-backend expert` | Passes `backend=` to docread |
+| `--docread-mode plain` | Default; matches docread `mode` |
+| `--docread-task ocr_text` | Sets `task=` query |
+| `--docread-token-limit 8192` | Sets `token_limit=` |
+| `--docread-api-token TOKEN` | Sends `Authorization: Bearer …` |
+| `--docread-no-verify-ssl` | Disables TLS verification |
+| `--docread-no-remote-geometry-hints` | Skips extra HTTP calls for `--rotate-pages` / `--deskew` hints (see below) |
 
 ### Word boxes and layout
 
-Best selection alignment comes from ocr-demo **`analyzeResult.pages[].words`** with real polygons (for example `OCR_WORD_DETECTOR=doctr` or `paddleocr` on the server). If there are no words, the plugin falls back to **`layout`** region `bbox_2d` + `content`, then to full-page text.
+Best selection alignment comes from docread **`analyzeResult.pages[].words`** with real polygons (for example `OCR_WORD_DETECTOR=doctr` or `paddleocr` on the server). If there are no words, the plugin falls back to **`layout`** region `bbox_2d` + `content`, then to full-page text.
 
 ### Rotation / deskew and `DESKEW_ENABLED`
 
-When **`--rotate-pages`** or **`--deskew`** is enabled, OCRmyPDF calls `get_orientation` / `get_deskew` on the raster preview. By default this plugin performs **additional HTTP requests** to ocr-demo and maps `analyzeResult.pages[0].angle` (net CCW correction metadata when server deskew is on) into those hooks. This mapping is **heuristic**; for strict alignment when ocr-demo uses internal deskew, prefer **`DESKEW_ENABLED=false`** on the server and let OCRmyPDF handle deskew locally, or pass **`--ocrdemo-no-remote-geometry-hints`** and manage geometry entirely on the OCRmyPDF side.
+When **`--rotate-pages`** or **`--deskew`** is enabled, OCRmyPDF calls `get_orientation` / `get_deskew` on the raster preview. By default this plugin performs **additional HTTP requests** to docread and maps `analyzeResult.pages[0].angle` (net CCW correction metadata when server deskew is on) into those hooks. This mapping is **heuristic**; for strict alignment when docread uses internal deskew, prefer **`DESKEW_ENABLED=false`** on the server and let OCRmyPDF handle deskew locally, or pass **`--docread-no-remote-geometry-hints`** and manage geometry entirely on the OCRmyPDF side.
 
 ## Paperless-ngx integration
 
@@ -50,20 +52,20 @@ When **`--rotate-pages`** or **`--deskew`** is enabled, OCRmyPDF calls `get_orie
 
 ### Steps
 
-1. **Run ocr-demo** (or any compatible `POST /api/ocr` backend) on a host/port reachable from the **Paperless worker** (the process that consumes documents — often the `paperless` service in Docker Compose, not only the web container).
+1. **Run docread** on a host/port reachable from the **Paperless worker** (the process that consumes documents — often the `paperless` service in Docker Compose, not only the web container).
 
-2. **Install this package** in the **same Python environment** as Paperless (same venv or extend the official Docker image with `pip install ocrmypdf-ocrdemo`). The setuptools entry point registers the plugin with OCRmyPDF; **do not** also pass a duplicate `plugins` list for this module (same rule as [Entry point](#entry-point)).
+2. **Install this package** in the **same Python environment** as Paperless (same venv or extend the official Docker image with `pip install ocrmypdf-docread`). The setuptools entry point registers the plugin with OCRmyPDF; **do not** also pass a duplicate `plugins` list for this module (same rule as [Entry point](#entry-point)).
 
-3. **OCRmyPDF version** — Paperless currently pins **`ocrmypdf~=16.12`** in its own dependencies, while **ocrmypdf-ocrdemo** requires **`ocrmypdf>=17`**. Until Paperless bumps that pin, you need a **custom image or dependency override** that installs OCRmyPDF 17+ and re-tests document consumption. After versions align, a normal `pip install ocrmypdf-ocrdemo` in the Paperless image is enough.
+3. **OCRmyPDF version** — Paperless currently pins **`ocrmypdf~=16.12`** in its own dependencies, while **ocrmypdf-docread** requires **`ocrmypdf>=17`**. Until Paperless bumps that pin, you need a **custom image or dependency override** that installs OCRmyPDF 17+ and re-tests document consumption. After versions align, a normal `pip install ocrmypdf-docread` in the Paperless image is enough.
 
-4. **Keep Tesseract** installed in that image (Paperless / OCRmyPDF still expect it for checks and the rest of the pipeline, even when `ocr_engine` is `ocrdemo`).
+4. **Keep Tesseract** installed in that image (Paperless / OCRmyPDF still expect it for checks and the rest of the pipeline, even when `ocr_engine` is `docread`).
 
 5. **Set user kwargs** so OCRmyPDF selects this engine and knows the API base URL. Option names use **underscores** (same as OCRmyPDF’s Python API / CLI `dest` names). Minimal example:
 
    ```json
    {
-     "ocr_engine": "ocrdemo",
-     "ocrdemo_base_url": "http://ocr-demo:8000"
+     "ocr_engine": "docread",
+     "docread_base_url": "http://docread:8000"
    }
    ```
 
@@ -71,12 +73,12 @@ When **`--rotate-pages`** or **`--deskew`** is enabled, OCRmyPDF calls `get_orie
 
    ```yaml
    environment:
-     PAPERLESS_OCR_USER_ARGS: '{"ocr_engine":"ocrdemo","ocrdemo_base_url":"http://ocr-demo:8000"}'
+     PAPERLESS_OCR_USER_ARGS: '{"ocr_engine":"docread","docread_base_url":"http://docread:8000"}'
    ```
 
-   Optional keys match the CLI flags above, for example `ocrdemo_api_token`, `ocrdemo_timeout`, `ocrdemo_mode`, `ocrdemo_backend`, `ocrdemo_no_verify_ssl`, `ocrdemo_no_remote_geometry_hints`, etc.
+   Optional keys match the CLI flags above, for example `docread_api_token`, `docread_timeout`, `docread_mode`, `docread_backend`, `docread_no_verify_ssl`, `docread_no_remote_geometry_hints`, etc.
 
-6. **Timeouts** — remote OCR can exceed local Tesseract. If tasks abort, increase **`PAPERLESS_TASK_WORKER_TIMEOUT`** and/or `ocrdemo_timeout` in user args.
+6. **Timeouts** — remote OCR can exceed local Tesseract. If tasks abort, increase **`PAPERLESS_TASK_WORKER_TIMEOUT`** and/or `docread_timeout` in user args.
 
 7. **OCR mode** — continue to use Paperless’s **`PAPERLESS_OCR_MODE`** (`skip`, `redo`, `force`, …) as usual; those map to OCRmyPDF’s `skip_text` / `redo_ocr` / `force_ocr` before your user args are merged.
 
@@ -93,8 +95,8 @@ This project is licensed under the **Apache License 2.0** — see [LICENSE](LICE
 
 ## Entry point
 
-The package registers a setuptools entry point so OCRmyPDF auto-loads this plugin when it is installed in the same environment. **Do not** also pass `--plugin ocrmypdf_ocrdemo.plugin` in that case (pluggy would try to register the module twice). Use `--plugin …` only for a one-off path, for example:
+The package registers a setuptools entry point so OCRmyPDF auto-loads this plugin when it is installed in the same environment. **Do not** also pass `--plugin ocrmypdf_docread.plugin` in that case (pluggy would try to register the module twice). Use `--plugin …` only for a one-off path, for example:
 
 ```bash
-ocrmypdf --plugin /path/to/ocrmypdf_ocrdemo/plugin.py ...
+ocrmypdf --plugin /path/to/ocrmypdf_docread/plugin.py ...
 ```

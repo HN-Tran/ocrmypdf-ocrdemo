@@ -1,4 +1,4 @@
-"""HTTP client for ocr-demo /api/ocr."""
+"""HTTP client for docread /api/ocr."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import httpx
 
 from ocrmypdf._options import OcrOptions
 
-from ocrmypdf_ocrdemo.config import get_ocrdemo_options
+from ocrmypdf_docread.config import get_docread_options
 
 log = logging.getLogger(__name__)
 
@@ -19,11 +19,11 @@ def post_ocr_sync(
     image_path: Path,
     options: OcrOptions,
 ) -> dict[str, Any]:
-    """POST a single page image to ocr-demo and return JSON."""
-    oc = get_ocrdemo_options(options)
+    """POST a single page image to docread and return JSON."""
+    oc = get_docread_options(options)
     base = str(oc.base_url).rstrip("/") if oc.base_url else ""
     if not base:
-        raise ValueError("ocrdemo base_url is not configured")
+        raise ValueError("docread base_url is not configured")
     url = f"{base}/api/ocr"
     params: dict[str, str | int] = {"mode": oc.mode}
     if oc.backend:
@@ -43,6 +43,6 @@ def post_ocr_sync(
     try:
         resp.raise_for_status()
     except httpx.HTTPStatusError as exc:
-        log.error("ocr-demo HTTP %s: %s", exc.response.status_code, exc.response.text[:500])
+        log.error("docread HTTP %s: %s", exc.response.status_code, exc.response.text[:500])
         raise
     return resp.json()
