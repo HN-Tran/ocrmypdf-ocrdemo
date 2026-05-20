@@ -1,0 +1,27 @@
+[project]
+name = "ocrmypdf-ocrdemo"
+version = "0.1.0"
+description = "OCRmyPDF plugin: OCR pages via an ocr-demo HTTP API (POST /api/ocr)"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [{ name = "HN-Tran" }]
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27.0",
+    "ocrmypdf>=17.0.0",
+    "pillow>=10.0.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0", "respx>=0.21.0"]
+
+[project.entry-points."ocrmypdf"]
+ocrdemo = "ocrmypdf_ocrdemo.plugin"
+
+[build-system]
+requires = ["uv_build>=0.11.14,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
